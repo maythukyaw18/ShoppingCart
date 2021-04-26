@@ -1,0 +1,124 @@
+﻿@model IEnumerable<ShoppingCartCA.Models.Cart>
+@{
+    ViewData["Title"] = "View Cart";
+    List<Cart> CartItems = (List<Cart>)ViewData["CartItems"];
+    ShoppingCartCA.Container.SessionData session = (ShoppingCartCA.Container.SessionData)ViewData["SessionData"];
+
+    var cartItemCount = ViewData["cartItemCount"];
+    var user = (session != null) ? session.UserName : null;
+    var sessionID = (session != null) ? session.SessionID : null;
+    var userFullName = (session != null) ? session.FirstName + " " + session.LastName : null;
+
+    decimal totalPrice = 0;
+    var error = "No record found";
+    if(CartItems != null)
+        foreach (var cart in CartItems)
+        {
+            totalPrice += (cart.Product.Price * cart.Quantity);
+        }
+
+
+}
+
+
+<h2>View Cart</h2>
+<div style="margin-top : 30px; margin-bottom : 30px">
+    @if (userFullName != null)
+    {
+        @:Welcome, @userFullName
+    }
+
+    &nbsp;
+
+    <a href="/ProductGallery/ViewProducts">Continue Shopping</a> &nbsp; | &nbsp;
+    @if (CartItems != null && CartItems.Count() != 0)
+    {
+        <a href="/Payment/Index">Check Out</a>
+        <div style="float:right; font-size: x-large; font-weight: bolder"><text id="TotalPrice" align="right">Total Price: $@totalPrice.ToString("0.00") </text></div>
+
+    }
+    else
+    {
+        <br /><br />
+        <p style="text-align: center">No record found.</p>
+    }
+
+
+
+</div>
+
+
+<table class="tab">
+    @if(CartItems != null)
+    @foreach (var cart in CartItems)
+    {
+
+        <tr style="border-bottom:1px solid grey;margin-bottom:30px;margin-top:50px;padding-bottom:20px;">
+            <td width="40%">
+                <div class="card product_card">
+
+                    <img style="width:100%" src="~/image/@cart.Product.ProductImg" />
+                    <h5>@cart.Product.ProductName</h5>
+                    <h6>$ @cart.Product.Price.ToString("0.00")</h6>
+                    <p>@cart.Product.Description</p>
+
+
+                </div>
+            </td>
+            <td></td>
+            <td>
+                <div class="cart_prod_price">
+
+
+                    <p>Price : @cart.Product.Price.ToString("0.00")</p>
+                    <form method="POST" action="./UpdateQuantity" class="form-inline">
+                        <div class="form-group">
+                            <input type="hidden" id="productid" name="productId" value=@cart.ProductID />
+                            <input type="hidden" name="productId" class="pPrice" id="product_@cart.ProductID" value="@cart.Product.Price" />
+                            <label>Quantity : &nbsp;</label><br /><br />
+                            <input class="UpdateCart pQuantity form-control" type="number" id="@cart.ProductID" min="1" max="100" step="1" value="@cart.Quantity" name="qty" />
+                            <input type="submit" class="submitqty btn btn-primary ml-4" value="Update" />
+                        </div>
+                    </form>
+                    <br />
+                    <p><a href="./RemoveFromCart?productId=@cart.ProductID">Remove From Cart</a></p>
+                </div>
+            </td>
+        </tr>
+
+    }
+</table>
+
+<script>
+
+    var quantityInput = document.getElementsByClassName("pQuantity");
+    for (var i = 0; i < quantityInput.length; i++) {
+        var input = quantityInput[i];
+
+        input.addEventListener('change', function (event) {
+            var input = event.target;
+            if (isNaN(input.value) || input.value < 0) {
+                input.value = 1;
+            }
+            getTotalPrice();
+        });
+    }
+
+    function getTotalPrice() {
+        var total = 0;
+        var cartContainer = document.getElementsByClassName("cart_prod_price");
+        var chageInt = parseInt(cartContainer.length);
+        for (var i = 0; i < chageInt; i++) {
+            var cartContainers = cartContainer[i];
+            var priceElement = cartContainers.getElementsByClassName("pPrice")[0];
+            var quantityElement = cartContainers.getElementsByClassName("pQuantity")[0];
+            var price = parseFloat(priceElement.value);
+            var quantity = quantityElement.value;
+            total = total + (price * quantity);
+        }
+        document.getElementById("TotalPrice").innerHTML = "Total Price: $" + total.toFixed(2);
+
+    }
+</script>
+
+<link href="~/css/site.css" type="text/css" />

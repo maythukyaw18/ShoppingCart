@@ -1,0 +1,87 @@
+﻿
+@{
+    ViewData["Title"] = "PurchaseHistory";
+    var error = ViewData["norecord"];
+    List<MyPurchase> myPurchase = (List<MyPurchase>)ViewData["myPurchase"];
+    List<List<PurchaseDetails>> purchaseDetails = (List<List<PurchaseDetails>>)ViewData["activationCode"];
+
+    
+    var cartItemCount = ViewData["cartItemCount"];
+    ShoppingCartCA.Container.SessionData session = (ShoppingCartCA.Container.SessionData)ViewData["SessionData"];
+
+
+    var username = session.UserName;
+    var sessionid = session.SessionID;
+    var errorMsg = ViewData["err"];
+    var userFLName = session.FirstName + " " + session.LastName;
+}
+
+
+Welcome, @userFLName &nbsp;
+<a href="/ProductGallery/ViewProducts">Home</a> &nbsp; | &nbsp;
+<a href="~/Home/Logout">Logout</a>
+<br />
+<br />
+<h2>My Purchases</h2>
+<br />
+<div class="container">
+    @for (int i = 0; i < myPurchase.Count; i++)
+    {
+    <div class="row">
+        <div class="col-lg-6">
+            <img style="width:100%" src="~/image/@myPurchase[i].ProductImg" />
+            <div class="card-header">@myPurchase[i].ProductName</div>
+            <p>@myPurchase[i].Description</p>
+            <div class="text-right">
+                <input class="btn btn-primary" type="submit" id="Download" name="Download" value="Download" />
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h6>Purchased On: @myPurchase[i].Date</h6><br />
+            <h6>Quantity : @purchaseDetails[i].Count</h6><br />
+            <div style="text-align:left">
+                <h6> Activation Code:</h6>
+                <select class="form-control">
+                    @foreach (var d in purchaseDetails[i])
+                    {
+                        <option>@d.ActivationCode</option>
+                    }
+                </select><br />
+                
+                @if (myPurchase[i].Review != null)
+                {
+                   <h6>Rating given: @myPurchase[i].Review.Rating</h6>
+                   <small class="font-italic">Reviewed at @myPurchase[i].Review.CreatedAt</small>
+                }
+                else
+                {
+                    <h6>Rating:</h6>
+                    <form method="POST" action="./AddReview">
+                        <input type="hidden" name="productId" value="@myPurchase[i].ProductID" />
+                        <input type="hidden" name="purchaseId" value="@myPurchase[i].PurchaseID" />
+                        <select class="form-control" name="ratingScore" required>
+                            <option value="">Select a rating</option>
+                            <option value="1">1 star</option>
+                            <option value="2">2 stars</option>
+                            <option value="3">3 stars</option>
+                            <option value="4">4 stars</option>
+                            <option value="5">5 stars</option>
+                        </select><br />
+                        <button class="btn btn-success">Submit Review</button>
+                    </form>
+                }
+                
+            </div>
+        </div>
+    </div>
+    <hr />
+    }
+</div>
+<h5 style="text-align: center">@error</h5>
+
+
+
+<link href="~/css/site.css" type="text/css" />
+
+
+

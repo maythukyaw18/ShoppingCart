@@ -1,0 +1,41 @@
+﻿@model ShoppingCartCA.Models.UserInfo
+@{
+    ViewData["Title"] = "Login";
+    var ErrorMessage = ViewData["error"];
+}
+
+
+
+    <h1 class="text-center login-title">CA Shopping</h1>
+
+    <div class="container-fluid">
+        <div class="col-lg-4 offset-lg-4 card">
+            <div class="card-body">
+                <h5 class="card-title">Log in</h5>
+                @using (Html.BeginForm("Login", "Home", FormMethod.Post))
+                {
+                    <div class="form-group">
+                        <label for="UserName">@Html.LabelFor(x => x.UserName)&nbsp;</label>
+                        <input name="UserName" id="UserName" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="Password">@Html.LabelFor(x => x.Password)&nbsp;</label>
+                        <input type="password" name="Password" id="Password" class="form-control" required />
+                    </div>
+                    <label id="error"></label>
+                    <font color="red">@ErrorMessage</font>
+                    <div class="text-right">
+                        <input class="btn btn-success" type="Submit" value="Log in" id="Login">
+                    </div>
+                }
+                <hr />
+                <div class="text-center">
+                    <a href="../ProductGallery/ViewProducts">Or directly browse our products.</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/site.js" type="text/javascript"></script>
+
+
+

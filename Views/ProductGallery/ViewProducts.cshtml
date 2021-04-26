@@ -1,0 +1,117 @@
+﻿@model ShoppingCartCA.Models.Product
+@{
+    ViewData["Title"] = "ViewProducts";
+    List<Product> products = (List<Product>)ViewData["products"];
+    var search = ViewData["searchKeyword"];
+    var productRating = ViewData["productRating"];
+    ShoppingCartCA.Container.SessionData session = (ShoppingCartCA.Container.SessionData)ViewData["SessionData"];
+    var cartItemCount = ViewData["cartItemCount"];
+    var user = (session != null) ? session.UserName : null;
+    var sessionID = (session != null) ? session.SessionID : null;
+    var userFullName = (session != null) ? session.FirstName + " " + session.LastName : null;
+
+    int AddToCartSuccess = (int)ViewData["AddToCartSuccess"];
+    int AddedQty = (int)ViewData["AddedQty"];
+    string AddedProductName = (string)ViewData["AddedProductName"];
+
+}
+
+<h1>@search</h1>
+
+<form method="post">
+    @if (session != null)
+    {
+        <input type="hidden" name="sessionID" value='@sessionID' />
+
+    }
+    @if (session != null)
+    {
+        @:Welcome, @userFullName
+    }
+    &nbsp;
+    @if (session != null)
+    {
+        <a href="/MyPurchase/PurchaseHistory" id="mypurchase">My Purchase</a> @:&nbsp; | &nbsp;
+        <a href="~/Home/Logout">Logout</a>
+    }
+    else
+    {
+        <a href="/Home/Login">My Purchase</a> @:&nbsp; | &nbsp;
+        <a href="/Home/Login">Login</a>
+    }
+</form>
+<br />
+
+<form method="GET" action="/ProductGallery/ViewProducts" class="form-inline">
+    <div class="form-group">
+        <input class="form-control mb-4 mr-sm-4" placeholder="Search keyword" name="Keyword" type="text" id="Input" />
+        <input type="submit" value="Search" class="btn btn-success mb-4 mr-sm-4" />
+    </div>
+</form>
+
+<br />
+<br />
+
+@if (AddToCartSuccess == 1)
+{
+<div class="alert alert-success" role="alert">
+    @AddedQty x @AddedProductName has been added to cart.
+</div>
+
+}
+<h2>Best Seller</h2>
+<br />
+<div class="container">
+    <div class="row">
+        @if (products.Count == 0)
+        {
+            <br /><br />
+            <p style="text-align: center">No record found.</p>
+        }
+        @foreach (var p in products)
+        {
+            <div class="col-4 card pt-4 pb-2 mb-4">
+                <img height="200" src="~/image/@p.ProductImg">
+                <div class="card-header mb-2 mt-2">
+                    @p.ProductName
+                </div>
+                 @if(p.ProductRatingAverage != 0)
+                {
+                <div class="card-header mb-2 mt-2">
+                Rating: <b>@p.ProductRatingAverage</b> out of 5 <small class="text-right font-italic"> (@p.ProductRatingCount @if (p.ProductRatingCount > 1)
+                {
+                    @:reviews)
+                }
+                else
+                {
+                    @:review)
+                }</small>
+                </div>
+                }
+                else
+                {
+                    <div class="card-header mb-2 mt-2">
+                    Rating Not Available
+                    </div>
+                }
+                
+                @p.Description.Substring(0, 100)
+                @if (p.Description.Length > 100)
+                {
+                    @:..
+                }
+                <h5 class="text-right font-weight-bold">$ @p.Price.ToString("0.00")</h5>
+                <hr />
+                <form method="POST" action="/ProductGallery/AddtoCart">
+                    <div class="text-right">
+                        <input class="btn btn-success" type="submit" value="Add to Cart" />
+                    </div>
+                    <input type="hidden" name="productId" value="@p.ProductID" />
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+
+<link href="~/css/site.css" type="text/css" />
